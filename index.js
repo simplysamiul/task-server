@@ -47,9 +47,17 @@ async function run() {
         app.put("/updatestudent/:id", async(req,res)=>{
             const id = req.params.id;
             const updateInfo = req.body;
+            console.log(updateInfo);
             const filter = { _id: objectId(id)};
             const options = { upsert: true };
-            const updateDoc  = {$set: {updateInfo}};
+            const updateDoc  = {$set: {
+                name: updateInfo.name,
+                school: updateInfo.school,
+                className: updateInfo.className,
+                division: updateInfo.division,
+                birth_date: updateInfo.birth_date,
+                status: updateInfo.status
+            }};
             const result = await studentsCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         });

@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const { query } = require("express");
 const objectId = require("mongodb").ObjectId;
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -25,9 +26,19 @@ async function run() {
         const studentsCollection = database.collection("student");
         // Get all students
         app.get("/allstudents", async(req,res)=>{
+            const page = req.query.page
+            const dataSize = parseInt(req.query.pagedata);
+            console.log(page, dataSize);
             const cursor = studentsCollection.find({});
-            const students = await cursor.toArray();
-            res.json(students);
+            const count = await studentsCollection.countDocuments({});
+            let studentsData;
+            if(page){
+            studentsData = await cursor.skip((page-1) * dataSize).limit(dataSize).toArray();
+            }
+            else{
+                studentsData = await cursor.toArray();
+            }
+            res.json({count, studentsData});
         });
         // Get Specific Student Info
         app.get("/allstudents/:id", async(req,res)=>{
